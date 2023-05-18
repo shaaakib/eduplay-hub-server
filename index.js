@@ -27,8 +27,7 @@ async function run() {
 
     const toysCollection = client.db('toysDB').collection('toys');
 
-    app.get('/addtoys', async (req, res) => {
-      console.log(req.query.email);
+    app.get('/toys', async (req, res) => {
       let query = {};
       if (req.query?.email) {
         query = { seller_email: req.query.email };
@@ -37,13 +36,43 @@ async function run() {
       res.send(result);
     });
 
-    app.post('/addtoys', async (req, res) => {
+    app.post('/toys', async (req, res) => {
       const addToys = req.body;
       const result = await toysCollection.insertOne(addToys);
       res.send(result);
     });
 
-    app.delete('/addtoys/:id', async (req, res) => {
+    app.get('/toys/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await toysCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.put('/toys/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedToy = req.body;
+      const toy = {
+        $set: {
+          picture: updatedToy.picture,
+          toy_name: updatedToy.toy_name,
+          seller_name: updatedToy.seller_name,
+          seller_email: updatedToy.seller_email,
+          price: updatedToy.price,
+          rating: updatedToy.rating,
+          quantity: updatedToy.quantity,
+          description: updatedToy.description,
+          category: updatedToy.category,
+        },
+      };
+
+      const result = await toysCollection.updateOne(filter, toy, options);
+      res.send(result);
+    });
+
+    app.delete('/toys/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await toysCollection.deleteOne(query);
