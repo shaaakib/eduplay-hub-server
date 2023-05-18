@@ -32,7 +32,8 @@ async function run() {
       if (req.query?.email) {
         query = { seller_email: req.query.email };
       }
-      const result = await toysCollection.find(query).toArray();
+      const result = await toysCollection.find(query).limit(20).toArray();
+      // console.log(result);
       res.send(result);
     });
 
