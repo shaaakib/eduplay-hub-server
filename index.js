@@ -18,38 +18,24 @@ const client = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   },
-  maxPoolSize: 10,
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
 });
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    client.connect((err) => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-    });
-
-    // await client.connect();
-
     const toysCollection = client.db('toysDB').collection('toys');
 
     const indexKeys = { toy_name: 1 }; // Replace field1 and field2 with your actual field names
     const indexOptions = { name: 'toyName' }; // Replace index_name with the desired index name
 
-    const result = await toysCollection.createIndex(indexKeys, indexOptions);
+    app.get('/toyName/search', async (req, res) => {
+      const { keyword } = req.query;
 
-    app.get('/getToysSearchText/:text', async (req, res) => {
-      const SearchText = req.params.text;
-      const result = await toysCollection
-        .find({
-          $or: [{ toy_name: { $regex: SearchText, $options: 'i' } }],
-        })
+      const result = await toysCollection.createIndex(indexKeys, indexOptions);
+
+      const UserToys = await toysCollection
+        .find({ toy_name: { $regex: keyword, $options: 'i' } })
         .toArray();
-      res.send(result);
+      res.send(UserToys);
     });
 
     app.get('/toys', async (req, res) => {
