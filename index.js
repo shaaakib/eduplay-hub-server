@@ -33,7 +33,7 @@ async function run() {
       }
     });
 
-    await client.connect();
+    // await client.connect();
 
     const toysCollection = client.db('toysDB').collection('toys');
 
@@ -41,23 +41,14 @@ async function run() {
       let query = {};
       if (req.query?.category) {
         query = { category: req.query.category };
-        // const result = await toysCollection.find(query).toArray();
-        // res.send(result);
       }
       if (req.query?.email) {
         query = { seller_email: req.query.email };
       }
       const result = await toysCollection.find(query).limit(20).toArray();
-      // console.log(result);
+
       res.send(result);
     });
-
-    // app.get('/alltoys/:id', async (req, res) => {
-    //   const category = req.query.category;
-    //   const filter = { category: category };
-    //   const result = await toysCollection.find(filter).toArray();
-    //   res.send(result);
-    // });
 
     app.post('/toys', async (req, res) => {
       const addToys = req.body;
