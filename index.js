@@ -45,20 +45,24 @@ async function run() {
       if (req.query?.email) {
         query = { seller_email: req.query.email };
       }
-      const result = await toysCollection.find(query).limit(20).toArray();
+      const result = await toysCollection
+        .find(query)
+        .sort({ createdAt: -1 })
+        .limit(20)
+        .toArray();
 
       res.send(result);
     });
 
     app.post('/toys', async (req, res) => {
       const addToys = req.body;
+      addToys.createdAt = new Date();
       const result = await toysCollection.insertOne(addToys);
       res.send(result);
     });
 
     app.get('/toys/:id', async (req, res) => {
       const id = req.params;
-      console.log('single data', id);
       const query = { _id: new ObjectId(id) };
       const result = await toysCollection.findOne(query);
       res.send(result);
