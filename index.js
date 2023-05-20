@@ -37,6 +37,21 @@ async function run() {
 
     const toysCollection = client.db('toysDB').collection('toys');
 
+    const indexKeys = { toy_name: 1 }; // Replace field1 and field2 with your actual field names
+    const indexOptions = { name: 'toyName' }; // Replace index_name with the desired index name
+
+    const result = await toysCollection.createIndex(indexKeys, indexOptions);
+
+    app.get('/getToysSearchText/:text', async (req, res) => {
+      const SearchText = req.params.text;
+      const result = await toysCollection
+        .find({
+          $or: [{ toy_name: { $regex: SearchText, $options: 'i' } }],
+        })
+        .toArray();
+      res.send(result);
+    });
+
     app.get('/toys', async (req, res) => {
       let query = {};
       if (req.query?.category) {
